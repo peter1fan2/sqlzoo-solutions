@@ -27,3 +27,57 @@ SELECT id
 SELECT name	
  FROM actor JOIN casting ON actor.id=casting.actorid
  WHERE movieid=11768
+
+#7.Obtain the cast list for the film 'Alien'.
+SELECT name	
+FROM actor 
+LEFT JOIN casting ON actor.id=casting.actorid
+LEFT JOIN movie ON movie.id=actor.id
+WHERE movie.title = 'Alien' # Wrong answer. Too few rows
+# the right join and the right keywords
+SELECT name	
+FROM actor 
+RIGHT JOIN casting ON actor.id=casting.actorid
+RIGHT JOIN movie ON movie.id=casting.movieid
+WHERE movie.title = 'Alien'
+
+#8. List the films in which 'Harrison Ford' has appeared
+SELECT title 
+FROM movie
+RIGHT JOIN casting ON movie.id=casting.movieid
+RIGHT JOIN actor ON actor.id=casting.actorid
+WHERE actor.name='Harrison Ford'
+
+#9. List the films where 'Harrison Ford' has appeared - but not in the starring role. 
+SELECT title 
+FROM movie
+RIGHT JOIN casting ON movie.id=casting.movieid
+RIGHT JOIN actor ON actor.id=casting.actorid
+WHERE actor.name='Harrison Ford' AND ord!=1
+
+#10. List the films together with the leading star for all 1962 films.
+SELECT movie.title, actor.name
+FROM movie, actor, casting
+WHERE movie.id=casting.movieid AND actor.id=casting.actorid
+AND movie.yr=1962 AND ord=1
+
+#11. Which were the busiest years for 'John Travolta', show the year and the number of movies he made each year for any year in which he made more than 2 movies.
+SELECT yr,COUNT(title) FROM
+  movie JOIN casting ON movie.id=movieid
+         JOIN actor   ON actorid=actor.id
+where name='John Travolta'
+GROUP BY yr
+HAVING COUNT(title)=(SELECT MAX(c) FROM
+(SELECT yr,COUNT(title) AS c FROM
+   movie JOIN casting ON movie.id=movieid
+         JOIN actor   ON actorid=actor.id
+ where name='John Travolta'
+ GROUP BY yr) AS t
+)
+
+#12.List the film title and the leading actor for all of the films 'Julie Andrews' played in.
+
+
+
+
+
