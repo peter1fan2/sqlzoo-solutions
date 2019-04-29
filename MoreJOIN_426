@@ -76,7 +76,33 @@ HAVING COUNT(title)=(SELECT MAX(c) FROM
 )
 
 #12.List the film title and the leading actor for all of the films 'Julie Andrews' played in.
-
+SELECT title, name FROM
+  movie JOIN casting ON movie.id=movieid
+         JOIN actor   ON actorid=actor.id
+where name='Julie Andrews'
+% wrong number, all the film title with 'Julie Andrews'
+% Now I need to find out the leading actor
+SELECT movie.title, actor.name FROM
+  movie JOIN casting ON movie.id=movieid
+         JOIN actor   ON actorid=actor.id
+where title IN (
+SELECT title FROM
+  movie JOIN casting ON movie.id=movieid
+         JOIN actor   ON actorid=actor.id
+WHERE name='Julie Andrews')
+AND ord = 1 
+% there are two "little Miss Marker", therefore, I should clearify by selecting the id rather than the 'title' to remove the remake version.
+SELECT title, name
+  FROM movie, casting, actor
+  WHERE movieid=movie.id
+    AND actorid=actor.id
+    AND ord=1
+    AND movieid IN
+    (SELECT movieid FROM casting, actor
+     WHERE actorid=actor.id
+     AND name='Julie Andrews')
+     
+#13. Obtain a list, in alphabetical order, of actors who've had at least 30 starring roles.
 
 
 
