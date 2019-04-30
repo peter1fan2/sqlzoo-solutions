@@ -138,10 +138,11 @@ ORDER BY actor_numbers DESC, title
 SELECT name FROM movie, casting, actor
 WHERE movieid=movie.id
 AND actorid=actor.id
+AND name != 'Art Garfunkel'
 AND movieid IN (
 SELECT movieid FROM movie, casting, actor
 WHERE movieid=movie.id
 AND actorid=actor.id
 AND name = 'Art Garfunkel' )
-#Error: Wrong answer. Too many rows
+
 
