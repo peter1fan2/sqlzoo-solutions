@@ -103,6 +103,22 @@ SELECT title, name
      AND name='Julie Andrews')
      
 #13. Obtain a list, in alphabetical order, of actors who've had at least 30 starring roles.
+SELECT name FROM movie, casting, actor
+WHERE movieid=movie.id
+AND actorid=actor.id
+AND name IN 
+(SELECT name FROM casting, actor
+     WHERE actorid=actor.id 
+     AND ord=1 
+     AND COUNT(title)>=30 
+     GROUP BY name)
+#Error: Invalid use of group function
+#It should be count the ord >=30, not titles!!!
+SELECT name
+FROM actor
+  JOIN casting ON (id = actorid AND (SELECT COUNT(ord) FROM casting WHERE actorid = actor.id AND ord=1)>=30)
+GROUP BY name
+
 
 
 
