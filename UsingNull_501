@@ -83,5 +83,7 @@ WHEN teacher.dept =3 THEN 'Art' END,
 FROM teacher LEFT JOIN dept
 ON (teacher.dept=dept.id)
 
+Quiz section
+#1.  Select the code which uses an outer join correctly.
 
   
