@@ -52,3 +52,69 @@ FROM route a JOIN route b ON
   (a.company=b.company AND a.num=b.num)
 WHERE a.stop=115 AND b.stop=137
 #DISTINCT a,b is the DISTINCT of the combination!!!!!
+
+#8.Give a list of the services which connect the stops 'Craiglockhart' and 'Tollcross'
+SELECT a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart'
+AND stopb.name='Tollcross' 
+
+#9.Give a distinct list of the stops which may be reached from 'Craiglockhart' by taking one bus, including 'Craiglockhart' itself, offered by the LRT company. Include the company and bus no. of the relevant services.
+SELECT stopb.name,a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart'
+
+#10.Find the routes involving two buses that can go from Craiglockhart to Lochend.
+Show the bus no. and company for the first bus, the name of the stop for the transfer,
+and the bus no. and company for the second bus.
+
+SELECT a.num, a.company, stopb.name, b.num, b.company 
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+FROM route b JOIN route c ON
+  (b.company=c.company AND b.num=c.num)
+  JOIN stops stopb ON (b.stop=stopb.id)
+  JOIN stops stopc ON (c.stop=stopc.id)
+WHERE stopc.name='Lochend' 
+AND stopa.name='Craiglockhart'
+
+# You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM route b JOIN route c ON
+ (b.company=c.company AND b.num=c.num)
+ JOIN st' at line 7
+ 
+SELECT DISTINCT a.num, a.company, stopb.name, c.num, c.company 
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+JOIN (route c JOIN route d ON (c.company = d.company AND c.num= d.num) )
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+  JOIN stops stopc ON (c.stop=stopc.id)
+  JOIN stops stopd ON (d.stop=stopd.id)
+WHERE stopd.name='Lochend' 
+AND stopa.name='Craiglockhart'
+# Wrong answer. Too many rows
+! we could not JOIN a and b, then JOIN b and c AS ONE TABLE.
+! Therefore, we EMPLOY AN EXTRA TABLE TO make it works. Also, we need use 
+!! stopb.name = stopc.name to make sure the extra table equals table d!!!
+
+SELECT DISTINCT a.num, a.company, stopb.name, c.num, c.company 
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+JOIN (route c JOIN route d ON (c.company = d.company AND c.num= d.num) )
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+  JOIN stops stopc ON (c.stop=stopc.id)
+  JOIN stops stopd ON (d.stop=stopd.id)
+WHERE stopd.name='Lochend' 
+AND stopa.name='Craiglockhart'
+AND stopb.name = stopc.name
+
+
