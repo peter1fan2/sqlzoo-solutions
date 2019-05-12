@@ -27,6 +27,12 @@ SELECT id
 SELECT name	
  FROM actor JOIN casting ON actor.id=casting.actorid
  WHERE movieid=11768
+ 
+--OR WORKING ON THE DIFFERENT DIRECTIONS
+ SELECT name FROM actor
+JOIN casting ON actor.id=actorid
+JOIN movie ON movie.id = movieid
+WHERE title = 'Casablanca'
 
 #7.Obtain the cast list for the film 'Alien'.
 SELECT name	
@@ -34,12 +40,20 @@ FROM actor
 LEFT JOIN casting ON actor.id=casting.actorid
 LEFT JOIN movie ON movie.id=actor.id
 WHERE movie.title = 'Alien' # Wrong answer. Too few rows
+
 # the right join and the right keywords
 SELECT name	
 FROM actor 
 RIGHT JOIN casting ON actor.id=casting.actorid
 RIGHT JOIN movie ON movie.id=casting.movieid
 WHERE movie.title = 'Alien'
+
+--or even make it more easier
+
+SELECT name FROM actor
+JOIN casting ON actor.id=actorid
+JOIN movie ON movie.id = movieid
+WHERE title = 'Alien'
 
 #8. List the films in which 'Harrison Ford' has appeared
 SELECT title 
@@ -48,6 +62,13 @@ RIGHT JOIN casting ON movie.id=casting.movieid
 RIGHT JOIN actor ON actor.id=casting.actorid
 WHERE actor.name='Harrison Ford'
 
+
+--JOIN results rejoin!!!
+SELECT title FROM movie
+JOIN casting on movie.id=movieid
+JOIN actor ON actor.id=actorid
+WHERE name = 'Harrison Ford'
+
 #9. List the films where 'Harrison Ford' has appeared - but not in the starring role. 
 SELECT title 
 FROM movie
@@ -55,11 +76,24 @@ RIGHT JOIN casting ON movie.id=casting.movieid
 RIGHT JOIN actor ON actor.id=casting.actorid
 WHERE actor.name='Harrison Ford' AND ord!=1
 
+--easier JOIN
+
+SELECT title FROM movie
+JOIN casting on movie.id=movieid
+JOIN actor ON actor.id=actorid
+WHERE name = 'Harrison Ford' AND ord !=1
+
 #10. List the films together with the leading star for all 1962 films.
 SELECT movie.title, actor.name
 FROM movie, actor, casting
 WHERE movie.id=casting.movieid AND actor.id=casting.actorid
 AND movie.yr=1962 AND ord=1
+
+-- anothr JOIN WAY
+SELECT title, name FROM movie
+JOIN casting ON movieid=movie.id
+JOIN actor on actorid=actor.id
+WHERE yr=1962 AND ord=1
 
 #11. Which were the busiest years for 'John Travolta', show the year and the number of movies he made each year for any year in which he made more than 2 movies.
 SELECT yr,COUNT(title) FROM
@@ -74,6 +108,14 @@ HAVING COUNT(title)=(SELECT MAX(c) FROM
  where name='John Travolta'
  GROUP BY yr) AS t
 )
+
+--easy ones!!!!
+SELECT yr, COUNT(movieid) FROM movie
+JOIN casting ON movie.id=movieid
+JOIN actor ON actor.id=actorid
+WHERE name = 'John Travolta'
+GROUP BY yr
+HAVING COUNT(movieid)>2
 
 #12.List the film title and the leading actor for all of the films 'Julie Andrews' played in.
 SELECT title, name FROM
@@ -102,6 +144,17 @@ SELECT title, name
      WHERE actorid=actor.id
      AND name='Julie Andrews')
      
+--Another way of doing it
+SELECT title, name FROM movie
+JOIN casting ON movie.id=movieid
+JOIN actor ON actor.id=actorid
+WHERE movie.id IN (
+SELECT movie.id FROM movie
+JOIN casting ON movie.id=movieid
+JOIN actor ON actor.id=actorid
+WHERE name='Julie Andrews'
+) AND ord=1
+     
 #13. Obtain a list, in alphabetical order, of actors who've had at least 30 starring roles.
 SELECT name FROM movie, casting, actor
 WHERE movieid=movie.id
@@ -119,6 +172,17 @@ FROM actor
   JOIN casting ON (id = actorid AND (SELECT COUNT(ord) FROM casting WHERE actorid = actor.id AND ord=1)>=30)
 GROUP BY name
 
+--EASY TO UNDERSTAND ANSWER!!! >=30 at least 30!!!
+SELECT name FROM actor
+WHERE id IN (
+SELECT actorid
+FROM casting
+WHERE ord=1
+GROUP BY actorid
+HAVING COUNT(ord)>=30
+)
+
+
 #14. List the films released in the year 1978 ordered by the number of actors in the cast, then by title.
 SELECT title
   FROM movie, casting, actor
@@ -135,6 +199,13 @@ SELECT title, COUNT(movieid) AS actor_numbers
 AND yr=1978
 GROUP BY title
 ORDER BY actor_numbers DESC, title
+--Or you can do it this way!!!
+
+SELECT title, COUNT(actorid) AS cast_number FROM movie
+JOIN casting ON movieid=movie.id
+WHERE yr=1978 
+GROUP BY title
+ORDER BY cast_number DESC, title
 
 #15. List all the people who have worked with 'Art Garfunkel'.
 SELECT name FROM movie, casting, actor
@@ -146,6 +217,15 @@ SELECT movieid FROM movie, casting, actor
 WHERE movieid=movie.id
 AND actorid=actor.id
 AND name = 'Art Garfunkel' )
+
+-- Or you can select this way
+SELECT name FROM actor
+JOIN casting ON actor.id=actorid
+WHERE movieid IN (
+SELECT movieid FROM casting
+JOIN actor ON actorid=actor.id
+WHERE name = 'Art Garfunkel'
+) AND name !='Art Garfunkel'
 
 1. Select the statement which lists the unfortunate directors of the movies which have caused financial loses (gross < budget)
 SELECT name
